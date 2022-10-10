@@ -50,14 +50,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun hasGPSEnabled():Boolean {
-        //LocationManager: gestor u orquestador o director de orquesta
-        //o el que lleva la batuta
-        var locationManager: LocationManager
-        = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-    }
+
 }
 
 
