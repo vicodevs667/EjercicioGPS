@@ -17,40 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.fabGps.setOnClickListener {
-            view -> enableGPSService()
-        }
     }
-
-    private fun enableGPSService() {
-        //Construir una ventana modal
-        //usando conceptos de la prog. funcional
-        //En kotlin cuando el último parámetro del método
-        //es una funcion lambda se puede poner la funcion fuera de los paréntesis
-        AlertDialog.Builder(this)
-            .setTitle(R.string.dialog_text_title)
-            .setMessage(R.string.dialog_text_description)
-            .setPositiveButton(R.string.dialog_button_acept,
-            DialogInterface.OnClickListener{
-                dialog, wich -> goToEnableGPS()
-            })
-            .setNegativeButton(R.string.dialog_button_deny) {
-                dialog, wich -> cancelGPS()
-            }
-            .setCancelable(true)
-            .show()
-    }
-
-    private fun cancelGPS() {
-        TODO("Not yet implemented")
-    }
-
-    private fun goToEnableGPS() {
-        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-        startActivity(intent)
-    }
-
-
 }
 
 
