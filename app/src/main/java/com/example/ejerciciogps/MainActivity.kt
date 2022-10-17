@@ -3,11 +3,13 @@ package com.example.ejerciciogps
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.example.ejerciciogps.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 
@@ -77,6 +79,36 @@ class MainActivity : AppCompatActivity() {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
+
+    private fun evaluatePermissionsGranted(): Boolean {
+        /*
+        PackageManager.PERMISSION_GRANTED = a un valor que android considera para indicar
+        si tu respectivo permiso en la app tiene o no habilitada esa opción
+        Lo que android considera como permiso otorgado 0
+        checkSelfPermission = evalua de acuerdo que al permiso que le pasas
+        que valor numérico tiene ese permiso y esos valores numéricos
+        representan si el permiso esta dado o no
+         */
+        return PERMISSION_GRANTED.all {
+            ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+    //Evaluar ambos permisos tanto COARSE como FINE
+    private fun checkPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(baseContext,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(baseContext,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun manageLocation() {
+        fusedLocation.lastLocation.addOnSuccessListener {
+            location -> requestNewLocation()
+        }
+    }
+
 }
 
 
