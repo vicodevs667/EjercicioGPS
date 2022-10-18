@@ -6,4 +6,5 @@
     <string name="dialog_text_description">Para usar esta app es necesario que habilites tu GPS, por favor ve y actívalo.</string>
     <string name="dialog_button_accept">Habilitar</string>
     <string name="dialog_button_denied">Denegar</string>
+    <string name="btn_coordenadas">Obtendremos localizacion con este boton</string>
 </resources>
