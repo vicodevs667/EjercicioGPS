@@ -3,8 +3,20 @@
     <string name="fab_texto">Habilitar GPS</string>
 
     <string name="dialog_text_title">Habilitar GPS?</string>
-    <string name="dialog_text_description">Esta aplicación necesita hacer uso de sus coordenadas, desea habilitar las mismas.</string>
-    <string name="dialog_button_acept">Habilitar</string>
+    <string name="dialog_text_description">
+        Esta aplicación necesita hacer uso de sus
+        coordenadas, desea habilitar las mismas.</string>
+    <string name="dialog_button_accept">Habilitar</string>
     <string name="dialog_button_deny">Denegar</string>
+
+
+
+
+
+
+
+
+
     <string name="btn_coordenadas">Captura los datos de latitud y longitud</string>
+    <string name="btn_gps">Habilitar GPS en el celular</string>
 </resources>
