@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
@@ -42,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     //que te va a ofrecer toda la información posible del sensor o del servicio
     //sobre datos de gps.
     private lateinit var fusedLocation: FusedLocationProviderClient
+    private var latitud: Double = 0.0
+    private var longitud: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,12 +87,20 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun manageLocationData() {
         //Configurar una petición de Localización para obtener datos de Coordenadas
-        var myLocationRequest = LocationRequest.create().apply {
+        //Builder se actualizó para la versión 21 y posteriores que vengan
+        var myLocationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            1000
+        ).setMaxUpdates(1)
+            .build()
+        //De esta manera se trabajaba con la versión 20 e inferiores
+        //de la librería de Google para localización
+        /*var myLocationRequest = LocationRequest.create().apply {
             priority = Priority.PRIORITY_HIGH_ACCURACY
             interval = 0
             fastestInterval = 0
             numUpdates = 1
-        }
+        }*/
         //fusedLocation = LocationServices.getFusedLocationProviderClient(this)
         fusedLocation.requestLocationUpdates(myLocationRequest, myLocationCallback, Looper.myLooper())
     }
@@ -102,11 +113,37 @@ class MainActivity : AppCompatActivity() {
             super.onLocationResult(locationResult)
             var myLastLocation: Location? = locationResult.lastLocation
             if (myLastLocation != null) {
-                binding.txtLatitud.text = myLastLocation.latitude.toString()
-                binding.txtLongitud.text = myLastLocation.longitude.toString()
+                latitud = myLastLocation.latitude
+                longitud = myLastLocation.longitude
+                binding.txtLatitud.text = latitud.toString()
+                binding.txtLongitud.text = longitud.toString()
+                //Vamos a obtener la dirección del servicios de Google
+                resolveAddress()
             } else
                 Toast.makeText(applicationContext, "No se pudo capturar coordendas", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun resolveAddress() {
+        //Dirección usa o necesita una clase llamada Geocoder.....
+        val geocoder = Geocoder(this)
+        try {
+            var direcciones = geocoder.getFromLocation(latitud, longitud, 1)
+            binding.txtDireccion.text = direcciones.get(0).getAddressLine(0)
+        } catch (e: java.lang.Exception) {
+            binding.txtDireccion.text = "Dirección no disponible"
+        }
+    }
+
+    private fun calculateDistance(lastLatitude: Double, lastLongitude: Double): Double {
+        //Matemática basada en 3D para cálculo basado en coordenadas
+        val radioTierra = 6371 // kilómetros.
+        val diffLatitud = Math.toRadians(lastLatitude - latitud)
+        val diffLongitud = Math.toRadians(lastLongitude - longitud)
+        val sinLatitud = Math.sin(diffLatitud / 2)
+        val sinLongitud = Math.sin(diffLongitud / 2)
+        val distancia = 0.0
+        return distancia
     }
 
     //Métodos para habilitar GPS en dispositivo
