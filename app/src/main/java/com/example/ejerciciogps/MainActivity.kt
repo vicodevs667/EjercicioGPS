@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
@@ -44,6 +45,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocation: FusedLocationProviderClient
     //Vamos a necesitar un código de validación de permisos otorgados
     private val PERMISSION_ID = 42
+
+    private var latitud: Double = 0.0
+    private var longitud: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,12 +162,21 @@ class MainActivity : AppCompatActivity() {
         //llamado Callback
 
         //Configuración sencilla de una petición de Localización
-        var myLocationRequest = LocationRequest.create().apply {
+        //La configuración que ahora se utiliza desde la versión
+        //21 en adelante
+        var myLocationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            1000
+        ).setMaxUpdates(1)
+            .build()
+        //Esta configuración es para versiones 20 o inferiores
+        //de la librería de Google Services para Localización
+        /*var myLocationRequest = LocationRequest.create().apply {
             priority = Priority.PRIORITY_HIGH_ACCURACY
             numUpdates = 1
             interval = 0
             fastestInterval = 0
-        }
+        }*/
         //Es una petición de Locación actualizada
         fusedLocation.requestLocationUpdates(myLocationRequest, myLocationCallback, Looper.myLooper())
     }
@@ -174,10 +187,42 @@ class MainActivity : AppCompatActivity() {
             super.onLocationResult(locationResult)
             val myLocation: Location? = locationResult.lastLocation
             if (myLocation != null) {
-                binding.txtLatitud.text = myLocation.latitude.toString()
-                binding.txtLongitud.text = myLocation.longitude.toString()
+                latitud = myLocation.latitude
+                longitud = myLocation.longitude
+                binding.txtLatitud.text = latitud.toString()
+                binding.txtLongitud.text = longitud.toString()
+                resolveAddressCoordinates()
             }
         }
+    }
+
+    private fun resolveAddressCoordinates() {
+        //Geocoder es una clase que trabaja
+        //con información de los mapas de Google por ejemplo
+        val geocoder = Geocoder(this)
+        //Obtendremos direcciones y estas llegan
+        // en un arreglo
+        try {
+            val direcciones = geocoder.getFromLocation(
+                latitud,
+                longitud,
+                1
+            )
+            binding.txtDireccion.text = direcciones.get(0).getAddressLine(0)
+        } catch (e: Exception) {
+            binding.txtDireccion.text = "No se pudo ubicar dirección"
+        }
+    }
+
+    private fun calculateDistance(lastLatitud: Double,
+    lastLongitude: Double): Double {
+        val radioTierra = 6371.0 // kilómetros
+        val diffLatitud = Math.toRadians(lastLatitud - latitud)
+        val diffLongitud = Math.toRadians(lastLongitude - longitud)
+        val sinLaitud = Math.sin(diffLatitud / 2)
+        val sinLongitud = Math.sin(diffLongitud / 2)
+        val distance = 0.0
+        return distance
     }
 
 }
