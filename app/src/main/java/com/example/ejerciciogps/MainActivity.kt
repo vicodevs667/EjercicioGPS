@@ -167,9 +167,9 @@ class MainActivity : AppCompatActivity() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             if (locationResult != null) {
-                var myLastLocation = locationResult.lastLocation
-                binding.txtLatitud.text = myLastLocation.latitude.toString()
-                binding.txtLongitud.text = myLastLocation.longitude.toString()
+                var myLastLocation: Location? = locationResult.lastLocation
+                binding.txtLatitud.text = myLastLocation!!.latitude.toString()
+                binding.txtLongitud.text = myLastLocation!!.longitude.toString()
             }
         }
     }
