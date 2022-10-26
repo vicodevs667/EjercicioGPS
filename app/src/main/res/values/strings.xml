@@ -7,4 +7,5 @@
     <string name="dialog_button_acept">Habilitar</string>
     <string name="dialog_button_deny">Denegar</string>
     <string name="btn_coordenadas">Captura los datos de latitud y longitud</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

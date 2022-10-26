@@ -17,9 +17,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationCompat
+import com.example.ejerciciogps.Constantes.INTERVAL_TIME
 import com.example.ejerciciogps.databinding.ActivityMainBinding
 import com.google.android.gms.location.*
+import java.lang.Math.pow
 import java.util.jar.Manifest
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,6 +51,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocation: FusedLocationProviderClient
     private var latitud: Double = 0.0
     private var longitud: Double = 0.0
+    private var contador = 0
+    private var distancia = 0.0
+    private var velocidad = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,8 +99,8 @@ class MainActivity : AppCompatActivity() {
         //Builder se actualizó para la versión 21 y posteriores que vengan
         var myLocationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
-            1000
-        ).setMaxUpdates(1)
+            INTERVAL_TIME
+        ).setMaxUpdates(10)
             .build()
         //De esta manera se trabajaba con la versión 20 e inferiores
         //de la librería de Google para localización
@@ -113,10 +122,20 @@ class MainActivity : AppCompatActivity() {
             super.onLocationResult(locationResult)
             var myLastLocation: Location? = locationResult.lastLocation
             if (myLastLocation != null) {
+                var lastLatitude = myLastLocation.latitude
+                var lastLongitude = myLastLocation.longitude
+                binding.txtLatitud.text = lastLatitude.toString()
+                binding.txtLongitud.text = lastLongitude.toString()
+                if (contador > 0) {
+                    distancia = calculateDistance(lastLatitude, lastLongitude)
+                    //Revisar la distancia obtenida
+                    binding.txtDistancia.text = "$distancia mts."
+                    velocidad = calculateVelocity()
+                    binding.txtVelocidad.text = "$velocidad Km/h"
+                }
                 latitud = myLastLocation.latitude
                 longitud = myLastLocation.longitude
-                binding.txtLatitud.text = latitud.toString()
-                binding.txtLongitud.text = longitud.toString()
+                contador++
                 //Vamos a obtener la dirección del servicios de Google
                 resolveAddress()
             } else
@@ -140,11 +159,18 @@ class MainActivity : AppCompatActivity() {
         val radioTierra = 6371 // kilómetros.
         val diffLatitud = Math.toRadians(lastLatitude - latitud)
         val diffLongitud = Math.toRadians(lastLongitude - longitud)
-        val sinLatitud = Math.sin(diffLatitud / 2)
-        val sinLongitud = Math.sin(diffLongitud / 2)
-        val distancia = 0.0
+        val sinLatitud = sin(diffLatitud / 2)
+        val sinLongitud = sin(diffLongitud / 2)
+        val resultado1 = (pow(sinLatitud, 2.0) + (pow(sinLongitud, 2.0)
+                * cos(Math.toRadians(latitud))
+                * cos(Math.toRadians(lastLatitude))
+                ))
+        val resultado2 = 2 * atan2(sqrt(resultado1), sqrt(1 - resultado1))
+        val distancia = (radioTierra * resultado2) * 1000.0 //distancia en metros
         return distancia
     }
+
+    private fun calculateVelocity():Double = (distancia / (INTERVAL_TIME / 1000.0)) * 3.6
 
     //Métodos para habilitar GPS en dispositivo
     private fun enableGPSService() {
