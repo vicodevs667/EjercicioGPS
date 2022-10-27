@@ -7,4 +7,5 @@
     <string name="dialog_button_accept">Habilitar</string>
     <string name="dialog_button_denied">Denegar</string>
     <string name="btn_coordenadas">Obtendremos localizacion con este boton</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>
