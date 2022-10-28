@@ -2,6 +2,11 @@ package com.example.ejerciciogps
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
+import com.example.ejerciciogps.Coordenadas.megacenter
+import com.example.ejerciciogps.Coordenadas.stadium
+import com.example.ejerciciogps.Coordenadas.univalle
+import com.example.ejerciciogps.Coordenadas.valleLuna
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -10,6 +15,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
+import com.google.android.gms.maps.model.CameraPosition
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -40,9 +48,78 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        // el rango de Zoom va de 0 a 21 donde 20 el tope
+        // 20: se usa para edificios, construcciones, parques, casas
+        // 15: es bueno para ver calles
+        // 10: ciudad....
+        // 5: pais y continente
+        //es que ustedes pueden delimitar al usuario
+        // el acercamiento y alejamiento del Zoom
+        mMap.apply {
+            setMinZoomPreference(14f)
+            setMaxZoomPreference(18f)
+        }
+
+        //Agregar marcador (tachuela roja)
+        mMap.addMarker(MarkerOptions().position(univalle).title("Univalle"))
+        /*mMap.addMarker(MarkerOptions()
+            .position(stadium)
+            .title("Hernando Siles")
+            .draggable(true)
+        )*/
+        //metodo que valida el movimiento o animación de la cámara
+        //virtual del mapa
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(univalle))
+        //Configurar una cámara personalizada
+        /*val cameraUnivalle = CameraPosition.Builder()
+            .bearing(0f) // nueva orientación nuevo norte
+            .tilt(0f) //ángulo superior de la cámara
+            .zoom(16f)
+            .target(univalle)
+            .build()
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraUnivalle))*/
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
+        //Movimiento de la cámara usando corrutinas.
+        /*lifecycleScope.launch {
+            //pasa en segundo plano
+            //Similar a los hilos que conocen
+            delay(5_000)
+            //Método para animar la transición de la cámara
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(valleLuna, 16f))
+            delay(3_500)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(megacenter, 16f))
+        }*/
+        val cameraLaPaz = CameraPosition.Builder()
+            .bearing(120f)
+            .tilt(20f)
+            .target(univalle)
+            .zoom(15f)
+            .build()
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraLaPaz))
+        lifecycleScope.launch {
+            delay(3_500)
+            for (i in 0 .. 50) {
+                mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 400f))
+                delay(1_500)
+            }
+        }
+
+
+        //Evento sobre el mapa
+        //Evento click sobre el mapa en cualquier posición
+        mMap.setOnMapClickListener {
+                mMap.addMarker(MarkerOptions()
+                    .position(it)
+                    .title("mi nueva posicion")
+                    .snippet("${it.latitude}, ${it.longitude}"))
+            mMap.moveCamera(CameraUpdateFactory
+                .newLatLng(it))
+        }
     }
 }
+
+
+
+
+
+
