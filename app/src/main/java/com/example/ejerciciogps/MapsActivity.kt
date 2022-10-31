@@ -3,10 +3,6 @@ package com.example.ejerciciogps
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
-import com.example.ejerciciogps.Coordenadas.megacenter
-import com.example.ejerciciogps.Coordenadas.stadium
-import com.example.ejerciciogps.Coordenadas.univalle
-import com.example.ejerciciogps.Coordenadas.valleLuna
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -21,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    //Es el objeto que va a contener a su mapa de Google
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
@@ -33,6 +30,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
+        //El mapa de Google se carga asíncronamente
+        //sin congelar la pantalla o el hilo principal
         mapFragment.getMapAsync(this)
     }
 
@@ -45,76 +44,59 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    //Aquí ocurre toda la magia
+    //cuando el mapa esta listo.........
+    //cuando el mapa esta listo, les devuelve
+    //en un parámetro llamada googleMap, el mapa
+    //y todas sus características en ese objeto
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        //Las posiciones se manejan en un objeto
+        //que conjunciona latitud y longitud
+        //se llama LatLng
+        val egipto = LatLng(29.977469715789642, 31.132504839773578)
 
-        // el rango de Zoom va de 0 a 21 donde 20 el tope
-        // 20: se usa para edificios, construcciones, parques, casas
-        // 15: es bueno para ver calles
-        // 10: ciudad....
-        // 5: pais y continente
-        //es que ustedes pueden delimitar al usuario
-        // el acercamiento y alejamiento del Zoom
-        mMap.apply {
-            setMinZoomPreference(14f)
-            setMaxZoomPreference(18f)
-        }
+        //Marcador
+        //Tachuela roja que se posiciona en el mapa donde quieren
+        //ubicarse
+        mMap.addMarker(MarkerOptions()
+            .title("Pirámides de Giza")
+            .snippet("${egipto.latitude}, ${egipto.longitude}") //Contenido extra
+            .position(egipto)
+        )
 
-        //Agregar marcador (tachuela roja)
-        mMap.addMarker(MarkerOptions().position(univalle).title("Univalle"))
-        /*mMap.addMarker(MarkerOptions()
-            .position(stadium)
-            .title("Hernando Siles")
-            .draggable(true)
-        )*/
-        //metodo que valida el movimiento o animación de la cámara
-        //virtual del mapa
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(univalle))
-        //Configurar una cámara personalizada
-        /*val cameraUnivalle = CameraPosition.Builder()
-            .bearing(0f) // nueva orientación nuevo norte
-            .tilt(0f) //ángulo superior de la cámara
-            .zoom(16f)
-            .target(univalle)
-            .build()
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraUnivalle))*/
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
-        //Movimiento de la cámara usando corrutinas.
-        /*lifecycleScope.launch {
-            //pasa en segundo plano
-            //Similar a los hilos que conocen
-            delay(5_000)
-            //Método para animar la transición de la cámara
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(valleLuna, 16f))
-            delay(3_500)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(megacenter, 16f))
-        }*/
-        val cameraLaPaz = CameraPosition.Builder()
-            .bearing(120f)
-            .tilt(20f)
-            .target(univalle)
-            .zoom(15f)
-            .build()
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraLaPaz))
-        lifecycleScope.launch {
-            delay(3_500)
-            for (i in 0 .. 50) {
-                mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 400f))
-                delay(1_500)
-            }
-        }
+        //Colocar la cámara virtual en la posición requerida
+        //en el mapa
+        //La cámara se centra o coloca tus coordenadas
+        //en el centro de la pantalla
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(egipto, 17f))
+
+        /*
+        El zoom en el mapa va en un rango de 0 a 21
+        se le puede asignar desde 2 a 20
+        a partir de 5: continentes
+        a partir de 10: ciudades o paises
+        a partir de 15: se usa para calles avenidas
+        20: sirve para edificios, casas, parques, domicilios
+         */
 
 
-        //Evento sobre el mapa
-        //Evento click sobre el mapa en cualquier posición
+        //Mapas tienen eventos como los botones.
+        // se configura listener que escuchen esos eventos
+        //y resuelvan una acción ante ese evento
+        //El evento más sencillo e importante en los mapas
+        // es el click a cualquier parte del mapa de google
         mMap.setOnMapClickListener {
-                mMap.addMarker(MarkerOptions()
-                    .position(it)
-                    .title("mi nueva posicion")
-                    .snippet("${it.latitude}, ${it.longitude}"))
-            mMap.moveCamera(CameraUpdateFactory
-                .newLatLng(it))
+            //it es la posicion donde haces click con tu dedo
+            mMap.addMarker(MarkerOptions()
+                .title("Nueva ubicación Random")
+                .snippet("${it.latitude}, ${it.longitude}")
+                .position(it)
+                .draggable(true)
+            )
         }
+
+
     }
 }
 
