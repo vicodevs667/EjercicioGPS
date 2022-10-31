@@ -1,10 +1,16 @@
 package com.example.ejerciciogps
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
+import com.example.ejerciciogps.Coordenadas.hospitalObrero
+import com.example.ejerciciogps.Coordenadas.isabelCatolica
+import com.example.ejerciciogps.Coordenadas.lapaz
+import com.example.ejerciciogps.Coordenadas.maternoInfantil
 import com.example.ejerciciogps.Coordenadas.megacenter
 import com.example.ejerciciogps.Coordenadas.stadium
+import com.example.ejerciciogps.Coordenadas.triangular
 import com.example.ejerciciogps.Coordenadas.univalle
 import com.example.ejerciciogps.Coordenadas.valleLuna
 
@@ -16,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -29,6 +36,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        Utils.binding = binding
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -45,6 +53,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -78,7 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .target(univalle)
             .build()
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraUnivalle))*/
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lapaz, 12f))
         //Movimiento de la cámara usando corrutinas.
         /*lifecycleScope.launch {
             //pasa en segundo plano
@@ -89,7 +98,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             delay(3_500)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(megacenter, 16f))
         }*/
-        val cameraLaPaz = CameraPosition.Builder()
+        /*val cameraLaPaz = CameraPosition.Builder()
             .bearing(120f)
             .tilt(20f)
             .target(univalle)
@@ -102,8 +111,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 400f))
                 delay(1_500)
             }
+        }*/
+
+        //Configuracion de Bounds en el mapa
+        //Posterior sesgo de movilidad en el mapa
+        //Bounds: con respecto a suroeste y noreste
+        val lapazBounds = LatLngBounds(isabelCatolica, hospitalObrero)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lapaz, 12f))
+        lifecycleScope.launch {
+            delay(3_500)
+            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(lapazBounds, Utils.dp(32)))
+            //lapazBounds.center // es la posición central de la zona
+        }
+        mMap.setLatLngBoundsForCameraTarget(lapazBounds)
+
+        //Como habilitar el punto de indicación azul
+        //de mi coordenada en tiempo real en el mapa
+        mMap.isMyLocationEnabled = true
+
+        //Configuración de Controles en UI y gestures en el mapa
+        mMap.uiSettings.apply {
+            isZoomControlsEnabled = true//habilitar botones zoom_in y zoom_out
+            isCompassEnabled = true// habilitar brujula
+            isRotateGesturesEnabled = false // habilita o deshabilita la propiedad de rotación del mapa
+            isMapToolbarEnabled = true // habilitarse acceso al mapa de google para rutas y otros
+            isMyLocationButtonEnabled = true // habilita el boton para centrar tu posición
         }
 
+        //Trazar el tráfico en rutas cercanas a su ubicación
+        mMap.isTrafficEnabled = true
 
         //Evento sobre el mapa
         //Evento click sobre el mapa en cualquier posición
