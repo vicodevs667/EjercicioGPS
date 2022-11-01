@@ -3,6 +3,8 @@ package com.example.ejerciciogps
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
+import com.example.ejerciciogps.Coordenadas.stadium
+import com.example.ejerciciogps.Coordenadas.univalle
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -69,7 +71,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //en el mapa
         //La cámara se centra o coloca tus coordenadas
         //en el centro de la pantalla
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(egipto, 17f))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(egipto, 17f))
 
         /*
         El zoom en el mapa va en un rango de 0 a 21
@@ -80,6 +82,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         20: sirve para edificios, casas, parques, domicilios
          */
 
+        /**
+         * configuración personalizada de cámara
+         */
+        val camaraPersonalizada = CameraPosition.Builder()
+            .target(univalle)
+            .zoom(17f)
+            .tilt(45f) // ángulo de inclinación de la cámara
+            .bearing(245f) // ángulo para cambio de orientación del norte
+            .build()
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camaraPersonalizada))
+
+        /**
+         * Movimiento de la cámara
+         * usando Corrutinas: similares a hilos o procesos en background
+         */
+        /*mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
+        //uso de corrutinas......
+        lifecycleScope.launch {
+            delay(5000)
+            //transición de movimiento entre dos coordenadas
+            //simular movimiento en el mapa
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(stadium, 17f))
+        }*/
+        /**
+         * movimiento de la cámara por pixeles en pantalla
+         */
+        lifecycleScope.launch {
+            delay(5000)
+            for (i in 0 .. 50) {
+                mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 120f))
+                delay(500)
+            }
+        }
 
         //Mapas tienen eventos como los botones.
         // se configura listener que escuchen esos eventos
