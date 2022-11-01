@@ -13,4 +13,5 @@
     <string name="btn_coordenadas">Captura los datos de latitud y longitud</string>
     <string name="btn_gps">Habilitar GPS en el celular</string>
     <string name="btn_coordenada">Este boton obtiene coordenas en APP</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>
