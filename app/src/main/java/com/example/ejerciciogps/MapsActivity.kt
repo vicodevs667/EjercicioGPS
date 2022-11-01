@@ -4,6 +4,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.example.ejerciciogps.Coordenadas.avaroa
+import com.example.ejerciciogps.Coordenadas.hospitalObrero
+import com.example.ejerciciogps.Coordenadas.jardinJapones
+import com.example.ejerciciogps.Coordenadas.lapaz
+import com.example.ejerciciogps.Coordenadas.plazaIsabelCatolica
 import com.example.ejerciciogps.Coordenadas.univalle
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -14,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -94,23 +99,65 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(egipto, 18f))
 
         //Configurar una cámara personalizada
-        val cameraUnivalle = CameraPosition.Builder()
+        /*val cameraUnivalle = CameraPosition.Builder()
             .target(univalle)//ubicación donde va a centrarse la cámara
-            .zoom(18f)
-            .tilt(35f)//ángulo de inclinación de la cámara
-            .bearing(178f)// ángulo para cambiar orientación de vista del mapa 0-360
+            .zoom(16f)
+            .tilt(45f)//ángulo de inclinación de la cámara
+            .bearing(245f)// ángulo para cambiar orientación de vista del mapa 0-360
             .build()
-        //mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraUnivalle))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 18f))
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraUnivalle))
+         */
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 18f))
 
         //Movimiento de cámara utilizando procesos en background
         //utilizando Corrutinas
-        lifecycleScope.launch {
+        /*lifecycleScope.launch {
             delay(5000)
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(avaroa,18f))
+            delay(3_500)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(jardinJapones, 18f))
+        }*/
+        //Corrutina movimiento en la cámara pixel por pixel
+        /*lifecycleScope.launch {
+            delay(3_500)
+            for (i in 0 .. 50) {
+                mMap.animateCamera(
+                    CameraUpdateFactory.scrollBy(0f, 150f)
+                )
+                delay(1_000)
+            }
+        }*/
+
+
+        /**
+         * Sesgo de mapas
+         * Delimitar o concentrar al mapa en una zona determinada
+         * Bounds
+         */
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lapaz, 12f))
+        //se basa en las coordenadas noreste y suroeste de la región donde
+        //quieren trabajar
+        val lapazBounds = LatLngBounds(plazaIsabelCatolica, hospitalObrero)
+        lifecycleScope.launch {
+            delay(4_000)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(lapazBounds, 32))
+            //punto central del cuadrante
+            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lapazBounds.center, 18f))
+        }
+        //Sesgando el mapa a solo interacción en esa región Bounds
+        mMap.setLatLngBoundsForCameraTarget(lapazBounds)
+
+        /**
+         * Controles de UI del mapa y Gestures del mapa
+         */
+        mMap.uiSettings.apply {
+            isZoomControlsEnabled = true // botones de Zoom_in y Zoom_out
+            isCompassEnabled = true // ver la brujula y la orientación del mapa
+            isRotateGesturesEnabled = false //impide la rotación del mapa
+            isMapToolbarEnabled = true// habilitar ir al mapa para ver rutas o tu marcador
         }
 
-
+        mMap.isTrafficEnabled = true
 
 
 
