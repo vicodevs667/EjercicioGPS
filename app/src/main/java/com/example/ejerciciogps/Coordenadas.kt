@@ -8,4 +8,6 @@ object Coordenadas {
     val perez = LatLng(-16.49346799081998, -68.13718303166712)
     val torresMall = LatLng(-16.509345373225354, -68.12375512056181)
     val feria16Julio = LatLng(-16.500920000432075, -68.16341934016378)
+    val hospitalObrero = LatLng(-16.499134572255755, -68.11708835869982)
+    val lapaz = LatLng(-16.487949452741933, -68.11820589493456)
 }
