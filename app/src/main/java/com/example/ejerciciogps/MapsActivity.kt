@@ -2,6 +2,9 @@ package com.example.ejerciciogps
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
+import com.example.ejerciciogps.Coordenadas.casaJhere
+import com.example.ejerciciogps.Coordenadas.univalle
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -10,6 +13,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
+import com.google.android.gms.maps.model.CameraPosition
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -65,7 +71,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         //Posicionar la cámara en la ubicación de
         //preferencia
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(vancouver, 17f))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(vancouver, 17f))
+
+        /**
+         * Configuración de su cámara personalizada
+         */
+        val camaraPersonalizada = CameraPosition.Builder()
+            .target(univalle) // donde apunta la cámara
+            .zoom(17f) // 15 y 18 calles  20 edificios
+            .tilt(45f) //ángulo de inclinación de la cámara, no deberían ser agresivos con los ángulos
+            .bearing(195f) //cambio de orientación de 0 a 360
+            .build()
+        //mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camaraPersonalizada))
+
+        /**
+         * Movimiento de la cámara (animación de la cámara)
+         * Plus--- uso standar de corrutinas
+         */
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
+        //Corrutinas para apreciar mejor el movimiento
+        lifecycleScope.launch {
+            delay(5000)
+            //Para mover la cámara entre puntos en el mapa
+            //les recomiendo usar una animación que haga una transición
+            // de movimiento... se usa el método
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(casaJhere, 17f))
+        }
+
+
+
 
         //Evento de click sobre el mapa
         mMap.setOnMapClickListener {
