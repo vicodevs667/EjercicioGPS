@@ -42,6 +42,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        enableToggleButtons()
     }
 
     /**
@@ -139,6 +141,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             isMyLocationButtonEnabled = true // habilita el boton para centrar tu posición
         }
 
+        //Padding al mapa para que este no se solape con componentes que incorporan al diseño
+        mMap.setPadding(0, 0, 0, Utils.dp(64))
+
         //Trazar el tráfico en rutas cercanas a su ubicación
         mMap.isTrafficEnabled = true
 
@@ -151,6 +156,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     .snippet("${it.latitude}, ${it.longitude}"))
             mMap.moveCamera(CameraUpdateFactory
                 .newLatLng(it))
+        }
+    }
+
+    private fun enableToggleButtons() {
+        binding.toggleGroup.addOnButtonCheckedListener {
+                group, checkedId, isChecked ->
+            if (isChecked) {
+                mMap.mapType = when(checkedId) {
+                    R.id.btnNormal -> GoogleMap.MAP_TYPE_NORMAL
+                    R.id.btnHibrido -> GoogleMap.MAP_TYPE_HYBRID
+                    R.id.btnSatelital -> GoogleMap.MAP_TYPE_SATELLITE
+                    R.id.btnTerreno -> GoogleMap.MAP_TYPE_TERRAIN
+                    else -> GoogleMap.MAP_TYPE_NONE
+                }
+            }
         }
     }
 }
