@@ -33,6 +33,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        Utils.binding = binding
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         //Concepto clave y avanzado de Android.
@@ -157,7 +158,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             isMapToolbarEnabled = true// habilitar ir al mapa para ver rutas o tu marcador
         }
 
-        mMap.isTrafficEnabled = true
+        //Darle un padding al mapa para hacer
+        //que sus controles no se solapen con nuestro
+        //menù de botones
+        mMap.setPadding(0,0,0, Utils.dp(64))
+
+        //Para ver trafico de la ciudad
+        //mMap.isTrafficEnabled = true
 
 
 

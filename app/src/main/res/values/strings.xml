@@ -8,4 +8,10 @@
     <string name="dialog_button_denied">Denegar</string>
     <string name="btn_coordenadas">Obtendremos localizacion con este boton</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="fab_location">Habilitar localizacion</string>
+    <string name="btn_normal">Normal</string>
+    <string name="btn_hibrido">Hibrido</string>
+    <string name="btn_satelital">Satelital</string>
+    <string name="btn_terreno">Terreno</string>
+    <string name="btn_none">N/A</string>
 </resources>
