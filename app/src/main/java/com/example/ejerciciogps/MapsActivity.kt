@@ -1,9 +1,13 @@
 package com.example.ejerciciogps
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.example.ejerciciogps.Coordenadas.casaJhere
+import com.example.ejerciciogps.Coordenadas.cementerioJudios
+import com.example.ejerciciogps.Coordenadas.lapaz
+import com.example.ejerciciogps.Coordenadas.plazaAvaroa
 import com.example.ejerciciogps.Coordenadas.univalle
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -14,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -27,6 +32,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        Utils.binding = binding
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -48,6 +54,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     //Respuesta cuando el mapa esta listo para trabajar
     // el parámetro que tienen devuelve el mapa de
     // Google listo y configurado
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -88,15 +95,47 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * Movimiento de la cámara (animación de la cámara)
          * Plus--- uso standar de corrutinas
          */
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(univalle, 17f))
         //Corrutinas para apreciar mejor el movimiento
-        lifecycleScope.launch {
+        /*lifecycleScope.launch {
             delay(5000)
             //Para mover la cámara entre puntos en el mapa
             //les recomiendo usar una animación que haga una transición
             // de movimiento... se usa el método
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(casaJhere, 17f))
+        }*/
+
+        /**
+         * Movmiento de cámara por pixeles
+         * que puede ser horizontal, vertical o combinado
+         */
+        /*lifecycleScope.launch {
+            delay(5_000)
+            for (i in 0 .. 100) {
+                mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 140f))
+                delay(500)
+            }
+        }*/
+
+        /**
+         * Bounds para delimitar áreas de acción
+         * en el mapa, armar sesgos.
+         */
+        val univalleBounds = LatLngBounds(plazaAvaroa, cementerioJudios)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lapaz, 15f))
+        lifecycleScope.launch {
+            delay(3_500)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(univalleBounds, Utils.dp(32)))
+            //Punto central del cuadrante definido
+            delay(2000)
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(univalleBounds.center, 18f))
         }
+        // Como delimitar el área
+        mMap.setLatLngBoundsForCameraTarget(univalleBounds)
+
+        //Activar la posición actual en el mapa
+        //Evaluar permisos de GPS.......
+        mMap.isMyLocationEnabled = true
 
 
 
@@ -115,9 +154,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * y Gestures del mapa
          */
         mMap.uiSettings.apply {
+            isMyLocationButtonEnabled = true // activa el boton para posicionarte al centro del mapa
             isZoomControlsEnabled = true // controles de zoom
             isCompassEnabled = true // habilita el compás de la orientación
             isMapToolbarEnabled = true// botones complementarios del mapa
+            isRotateGesturesEnabled = false //ya no pueden rotar el mapa
+            isTiltGesturesEnabled = false //ya no pueden inclinar la cámara
+            isZoomGesturesEnabled = true // habilitar o deshabilitar gesture de zoom
         }
     }
 
