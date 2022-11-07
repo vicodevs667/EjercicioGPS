@@ -14,11 +14,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -162,6 +159,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             isTiltGesturesEnabled = false //ya no pueden inclinar la cámara
             isZoomGesturesEnabled = true // habilitar o deshabilitar gesture de zoom
         }
+
+        /**
+         * configuración, personalización, estilos de mapa
+         */
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
     }
 
 

@@ -14,4 +14,6 @@
     <string name="btn_gps">Habilitar GPS en el celular</string>
     <string name="btn_coordenada">Este boton obtiene coordenas en APP</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="btn_localizacion">Activar mi localizacion</string>
+    <string name="btn_normal">Normal</string>
 </resources>
