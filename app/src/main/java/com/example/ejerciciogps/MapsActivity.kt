@@ -3,6 +3,7 @@ package com.example.ejerciciogps
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.ejerciciogps.Coordenadas.hospitalObrero
 import com.example.ejerciciogps.Coordenadas.isabelCatolica
@@ -18,15 +19,13 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnMarkerDragListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -72,7 +71,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         //Agregar marcador (tachuela roja)
-        mMap.addMarker(MarkerOptions().position(univalle).title("Univalle"))
+        //mMap.addMarker(MarkerOptions().position(univalle).title("Univalle"))
         /*mMap.addMarker(MarkerOptions()
             .position(stadium)
             .title("Hernando Siles")
@@ -144,6 +143,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //Padding al mapa para que este no se solape con componentes que incorporan al diseño
         mMap.setPadding(0, 0, 0, Utils.dp(64))
 
+        /**
+         * estilo de mapa personalizado
+         */
+        mMap.setMapStyle(MapStyleOptions
+            .loadRawResourceStyle(this,
+            R.raw.my_map_style))
+
+        /**
+         * Configuración y personalización
+         * de marcadores
+         */
+        val univalleMarker = mMap.addMarker(MarkerOptions()
+            .position(univalle)
+            .title("Mi universidad")
+        )
+        univalleMarker?.run {
+            isDraggable = true
+            //setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+            //setIcon(BitmapDescriptorFactory.defaultMarker(170f))
+            //setIcon(BitmapDescriptorFactory.fromResource(R.drawable.navigation))
+            Utils.getBitmapFromVector(this@MapsActivity,
+                R.drawable.ic_house_48)?.let {
+                    setIcon(BitmapDescriptorFactory.fromBitmap(it))
+            }
+            rotation = 175f
+            isFlat = true // el marcador rote o no con respecto al mapa
+            setAnchor(0.5f, 0.5f)
+        }
+
+        /**
+         * Eventos en marcadores
+         */
+        mMap.setOnMarkerClickListener(this)
+        //En el draggable del marcador
+        mMap.setOnMarkerDragListener(this)
+
+
         //Trazar el tráfico en rutas cercanas a su ubicación
         mMap.isTrafficEnabled = true
 
@@ -172,6 +208,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        Toast.makeText(this, "${marker.position.latitude}, " +
+                "${marker.position.longitude}", Toast.LENGTH_LONG).show()
+        return false
+    }
+
+    override fun onMarkerDrag(marker: Marker) {
+        marker.alpha = 0.4f
+    }
+
+    override fun onMarkerDragEnd(marker: Marker) {
+        marker.alpha = 1.0f
+        marker.snippet = "${marker.position.latitude}, ${marker.position.longitude}"
+        //Para mostrar la ventana de información
+        marker.showInfoWindow()
+    }
+
+    override fun onMarkerDragStart(marker: Marker) {
+        marker.hideInfoWindow()
     }
 }
 
