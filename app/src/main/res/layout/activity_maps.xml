@@ -18,6 +18,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/black_transparent"
+        map:singleSelection="true"
+        map:checkedButton="@id/btnNormal"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintBottom_toBottomOf="parent"

@@ -13,11 +13,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -40,6 +37,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //El mapa de Google se carga asíncronamente
         //sin congelar la pantalla o el hilo principal
         mapFragment.getMapAsync(this)
+        //activar listener de conjunto de botones
+        setupToggleButtons()
     }
 
     /**
@@ -161,6 +160,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //establecer un padding al mapa
         mMap.setPadding(0,0,0,Utils.dp(64))// densidad de pixeles en pantalla
 
+        /**
+         * Estilo personalizado de mapa
+         */
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.my_map_style))
+
+        /**
+         * configuración y personalización de marcadores
+         */
+        val univalleMarcador = mMap.addMarker(MarkerOptions()
+            .title("Mi universidad")
+            .position(univalle)
+        )
+        univalleMarcador?.run {
+            //setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))//cambiar color marcador con opciones por defecto
+            //setIcon(BitmapDescriptorFactory.defaultMarker(86f))//cambiar color marcador con color personalizado
+            setIcon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant))//cambiar marcador con diseño personalizado
+            rotation = 145f
+            isFlat = true // el marcador rote o no rote con el mapa
+            setAnchor(0.5f, 0.5f)
+        }
+
         //Mapas tienen eventos como los botones.
         // se configura listener que escuchen esos eventos
         //y resuelvan una acción ante ese evento
@@ -175,8 +195,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .draggable(true)
             )
         }
+    }
 
-
+    private fun setupToggleButtons() {
+        binding.toggleGroup.addOnButtonCheckedListener {
+                group, checkedId, isChecked ->
+            if (isChecked) {
+                mMap.mapType = when(checkedId) {
+                    R.id.btnNormal -> GoogleMap.MAP_TYPE_NORMAL
+                    R.id.btnHibrido -> GoogleMap.MAP_TYPE_HYBRID
+                    R.id.btnSatelital -> GoogleMap.MAP_TYPE_SATELLITE
+                    R.id.btnTerreno -> GoogleMap.MAP_TYPE_TERRAIN
+                    else -> GoogleMap.MAP_TYPE_NONE
+                }
+            }
+        }
     }
 }
 
