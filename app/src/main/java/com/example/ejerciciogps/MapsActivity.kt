@@ -2,6 +2,7 @@ package com.example.ejerciciogps
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.ejerciciogps.Coordenadas.avaroa
 import com.example.ejerciciogps.Coordenadas.hospitalObrero
@@ -14,15 +15,12 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.example.ejerciciogps.databinding.ActivityMapsBinding
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     //Variable global que representa su mapa de Google
     private lateinit var mMap: GoogleMap
@@ -44,6 +42,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //El mapa de Google se obtine de manera asíncrona
         //busca cargar el mapa sin congelar tu pantalla
         mapFragment.getMapAsync(this)
+        setupToggleButtons()
     }
 
     /**
@@ -166,6 +165,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //Para ver trafico de la ciudad
         //mMap.isTrafficEnabled = true
 
+        /**
+         * configuración de estilo personalizado de mapa
+         */
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,
+            R.raw.my_map_style))
+
+        /**
+         * configuración de marcadores:
+         *  1) estilos, settings
+         *  2) Eventos al marcador
+         */
+        val univalleMarcador = mMap.addMarker(MarkerOptions()
+            .position(univalle)
+            .title("Mi universidad")
+        )
+        univalleMarcador?.run {
+            //setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))//cambiar color a marcador
+            //setIcon(BitmapDescriptorFactory.defaultMarker(310f))//cambiar color a marcador
+            setIcon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant))
+            rotation = 75f
+            setAnchor(0.5f, 0.5f)
+            isFlat = true // define si el marcador rota o no con el mapa
+            isDraggable = true
+        }
+        //Eventos a los marcadores
+        //Evento click en el marker
+        mMap.setOnMarkerClickListener(this)
+
 
 
         //Vamos a configurar el evento más simple
@@ -179,6 +206,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .position(it)
             )
         }
+    }
+
+    /**
+     * Configuración de menú de botones
+     */
+    private fun setupToggleButtons() {
+        binding.toggleGroup.addOnButtonCheckedListener {
+                group, checkedId, isChecked ->
+            if (isChecked) {
+                //Cambiar el tipo de mapa
+                mMap.mapType = when(checkedId) {
+                    R.id.btnNormal -> GoogleMap.MAP_TYPE_NORMAL
+                    R.id.btnHibrido -> GoogleMap.MAP_TYPE_HYBRID
+                    R.id.btnSatelital -> GoogleMap.MAP_TYPE_SATELLITE
+                    R.id.btnTerreno -> GoogleMap.MAP_TYPE_TERRAIN
+                    else -> GoogleMap.MAP_TYPE_NONE
+                }
+            }
+
+        }
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        Toast.makeText(this,
+            "${marker.position.latitude}, ${marker.position.longitude}",
+        Toast.LENGTH_LONG).show()
+        return false
     }
 }
 
