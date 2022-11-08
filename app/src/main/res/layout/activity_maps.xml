@@ -19,6 +19,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/black_transparent"
+        map:singleSelection="true"
+        map:checkedButton="@id/btnNormal"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintBottom_toBottomOf="parent"
@@ -32,6 +34,43 @@
             android:textColor="@color/white"
             android:textAppearance="?attr/textAppearanceCaption"
             style="?attr/materialButtonOutlinedStyle"/>
+        <Button
+            android:id="@+id/btnHibrido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:text="@string/btn_hibrido"
+            android:textColor="@color/white"
+            android:textAppearance="?attr/textAppearanceCaption"
+            style="?attr/materialButtonOutlinedStyle"/>
+        <Button
+            android:id="@+id/btnSatelital"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:text="@string/btn_satelital"
+            android:textColor="@color/white"
+            android:textAppearance="?attr/textAppearanceCaption"
+            style="?attr/materialButtonOutlinedStyle"/>
+        <Button
+            android:id="@+id/btnTerreno"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:text="@string/btn_terreno"
+            android:textColor="@color/white"
+            android:textAppearance="?attr/textAppearanceCaption"
+            style="?attr/materialButtonOutlinedStyle"/>
+        <Button
+            android:id="@+id/btnNone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:text="@string/btn_none"
+            android:textColor="@color/white"
+            android:textAppearance="?attr/textAppearanceCaption"
+            style="?attr/materialButtonOutlinedStyle"/>
+
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

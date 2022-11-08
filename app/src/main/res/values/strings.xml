@@ -16,4 +16,8 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="btn_localizacion">Activar mi localizacion</string>
     <string name="btn_normal">Normal</string>
+    <string name="btn_hibrido">Hibrido</string>
+    <string name="btn_satelital">Satelital</string>
+    <string name="btn_terreno">Terreno</string>
+    <string name="btn_none">N/A</string>
 </resources>

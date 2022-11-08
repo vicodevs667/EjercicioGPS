@@ -3,6 +3,7 @@ package com.example.ejerciciogps
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.ejerciciogps.Coordenadas.casaJhere
 import com.example.ejerciciogps.Coordenadas.cementerioJudios
@@ -19,7 +20,7 @@ import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -37,6 +38,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //El mapa se carga asíncronamente
         //No satura tu proceso principal o de la UI
         mapFragment.getMapAsync(this)
+        //activar evento listener de conjunto de botones
+        setupToggleButtons()
     }
 
     /**
@@ -164,8 +167,57 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * configuración, personalización, estilos de mapa
          */
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
+
+        /**
+         * Configuración y personalización de Marcadores
+         * Estilos, formas y eventos
+         */
+        val univalleMarcador = mMap.addMarker(
+            MarkerOptions().title("Mi universidad")
+                .position(univalle)
+        )
+        univalleMarcador?.run {
+            //setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))// cambio de color en base a tonos definidos por android
+            //setIcon(BitmapDescriptorFactory.defaultMarker(74f))//cambio de color, con color Hue personalizado
+            Utils.getBitmapFromVector(this@MapsActivity, R.drawable.ic_taxi_alert_64)?.let {
+                setIcon(BitmapDescriptorFactory.fromBitmap(it))
+            } //marcador personalizado a partir de imagenes vectoriales de la libreria de Android
+            setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker))//uso de marcador personalizado
+            rotation = 145f
+            setAnchor(0.5f, 0.5f)// punto de rotación central
+            isFlat = true // el marcador rota o no con el mapa
+            isDraggable = true // se puede arrastrar el marcador
+            snippet = "Texto alternativo"
+        }
+        //Eventos en markers
+        mMap.setOnMarkerClickListener(this)
     }
 
+
+    private fun setupToggleButtons() {
+        binding.toggleGroup.addOnButtonCheckedListener {
+                group, checkedId, isChecked ->
+            if (isChecked) {
+                mMap.mapType = when(checkedId) {
+                    R.id.btnNormal -> GoogleMap.MAP_TYPE_NORMAL
+                    R.id.btnHibrido -> GoogleMap.MAP_TYPE_HYBRID
+                    R.id.btnSatelital -> GoogleMap.MAP_TYPE_SATELLITE
+                    R.id.btnTerreno -> GoogleMap.MAP_TYPE_TERRAIN
+                    else -> GoogleMap.MAP_TYPE_NONE
+
+                }
+            }
+
+        }
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        //marker es el marcador al que le has hecho click
+        Toast.makeText(this, "${marker.position.latitude}, " +
+                "${marker.position.longitude}",
+        Toast.LENGTH_LONG).show()
+        return false
+    }
 
 
 }
