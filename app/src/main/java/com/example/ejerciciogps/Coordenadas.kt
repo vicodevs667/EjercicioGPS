@@ -12,7 +12,9 @@ object Coordenadas {
     val maternoInfantil = LatLng(-16.502016581834415, -68.11790028482194)
     val isabelCatolica = LatLng(-16.509243658853073, -68.12420209799866)
     val hospitalObrero = LatLng(-16.499251383760253, -68.11778405116497)
-
+    val cossmil = LatLng(-16.5049256127646, -68.11977563490073)
+    val infocal = LatLng(-16.505137829539283, -68.12217629027765)
+    val veterinaria = LatLng(-16.5003547333985, -68.12009912746926)
 }
 
 

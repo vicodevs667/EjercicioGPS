@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.example.ejerciciogps.Coordenadas.cossmil
 import com.example.ejerciciogps.Coordenadas.hospitalObrero
+import com.example.ejerciciogps.Coordenadas.infocal
 import com.example.ejerciciogps.Coordenadas.isabelCatolica
 import com.example.ejerciciogps.Coordenadas.lapaz
 import com.example.ejerciciogps.Coordenadas.maternoInfantil
@@ -15,6 +17,7 @@ import com.example.ejerciciogps.Coordenadas.stadium
 import com.example.ejerciciogps.Coordenadas.triangular
 import com.example.ejerciciogps.Coordenadas.univalle
 import com.example.ejerciciogps.Coordenadas.valleLuna
+import com.example.ejerciciogps.Coordenadas.veterinaria
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -230,6 +233,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         }
 
+        /**
+         * Trazo areas de interes en el mapa, Polygon
+         */
+        setupPolygon()
+
+
 
 
         //Trazar el tráfico en rutas cercanas a su ubicación
@@ -245,6 +254,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             mMap.moveCamera(CameraUpdateFactory
                 .newLatLng(it))
         }
+    }
+
+    private fun setupPolygon() {
+        val miArea = mutableListOf(stadium, veterinaria,
+            triangular, infocal, cossmil, maternoInfantil, hospitalObrero)
+        val myPolygon = mMap.addPolygon(PolygonOptions()
+            .clickable(true)
+            .geodesic(true)
+            .fillColor(Color.WHITE)//color de relleno
+            .strokeColor(Color.RED) //color de la linea
+            .add(stadium, veterinaria, triangular, infocal,
+            cossmil, maternoInfantil, hospitalObrero)
+     )
+        //myPolygon.tag = "Mi Ruta universitaria"
+        //myPolygon.points = miArea
     }
 
     private fun setupSecondPolyline() {
