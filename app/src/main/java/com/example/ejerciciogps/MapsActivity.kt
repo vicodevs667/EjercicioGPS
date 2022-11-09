@@ -1,6 +1,7 @@
 package com.example.ejerciciogps
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -179,9 +180,55 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         //En el draggable del marcador
         mMap.setOnMarkerDragListener(this)
 
+        /**
+         * Eventos para trazar lineas y formas entre puntos
+         * Ejemplo de aplicacion trazado de rutas......
+         */
+        //Para dibujar una linea entre puntos, debes referenciar los puntos
+        //en coordenas de LatLng en un arreglo....
+        val rutas = mutableListOf(
+            univalle,
+            triangular,
+            hospitalObrero,
+            stadium
+        )
+        //Rutas se traza lineas y a esas lineas se las conoce como Polyline
+        val polyline = mMap.addPolyline(PolylineOptions()
+            .color(Color.MAGENTA)
+            .width(4f)
+            .geodesic(true) //toma en cuenta el radio de curvatura de la tierra.
+            .clickable(true)
+        )
+        //polyline.points = rutas
+        lifecycleScope.launch {
+            val runtimeRoutes = mutableListOf<LatLng>()
+            for (coordenada in rutas) {
+                runtimeRoutes.add(coordenada)
+                polyline.points = runtimeRoutes
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(coordenada))
+                delay(2_500)
+            }
+        }
+        //Personalizacion de Linea Polyline
+        polyline.pattern = listOf(Dot(), Gap(16f), Dash(32f), Gap(16f))
+        //Tipo de union de los trazos de las lineas
+        polyline.jointType = JointType.BEVEL // ROUND que es redondear las intersecciones
+        //polyline.width = 40f
+
+        /**
+         * Evento de click sobre la linea trazada Polyline
+         */
+        polyline.tag = "Ruta de Univalle a Stadium"
+        mMap.setOnPolylineClickListener {
+            Toast.makeText(this, "${polyline.tag}",
+                Toast.LENGTH_SHORT).show()
+
+        }
+
+
 
         //Trazar el tráfico en rutas cercanas a su ubicación
-        mMap.isTrafficEnabled = true
+        //mMap.isTrafficEnabled = true
 
         //Evento sobre el mapa
         //Evento click sobre el mapa en cualquier posición
