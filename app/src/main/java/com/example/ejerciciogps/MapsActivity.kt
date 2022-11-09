@@ -1,7 +1,10 @@
 package com.example.ejerciciogps
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.ejerciciogps.Coordenadas.hospitalObrero
 import com.example.ejerciciogps.Coordenadas.lapaz
@@ -18,7 +21,8 @@ import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnMarkerDragListener {
 
     //Es el objeto que va a contener a su mapa de Google
     private lateinit var mMap: GoogleMap
@@ -179,7 +183,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             rotation = 145f
             isFlat = true // el marcador rote o no rote con el mapa
             setAnchor(0.5f, 0.5f)
+            isDraggable = true
         }
+        //Eventos en marcadores
+        mMap.setOnMarkerClickListener(this)
+        //cuando la interfaz a implementar tiene muchos métodos
+        //mejor haganlo de la forma tradicional
+        mMap.setOnMarkerDragListener(this)
+
+        /**
+         * Trazado de lineas Areas y circulos en el mapa
+         * trazar una linea entre dos puntos se llama Polyline
+         */
+        setupPolyline()
 
         //Mapas tienen eventos como los botones.
         // se configura listener que escuchen esos eventos
@@ -197,6 +213,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun setupPolyline() {
+        //Las lineas Polyline dependen de un arreglo o lista de coordenadas
+        val misRutas = mutableListOf(univalle, stadium, hospitalObrero)
+        val polyline = mMap.addPolyline(PolylineOptions()
+            .color(Color.YELLOW)
+            .width(10f)// ancho de la linea
+            .clickable(true)// la linea puede ser clickeada
+            .geodesic(true)// curvatura con respecto al radio de la tierra
+        )
+        //polyline.points = misRutas
+        //trazar rutas en tiempo real simulando movimiento
+        lifecycleScope.launch {
+            val misRutasEnTiempoReal = mutableListOf<LatLng>()
+            for (punto in misRutas){
+                misRutasEnTiempoReal.add(punto)
+                polyline.points = misRutasEnTiempoReal
+                delay(2_000)
+            }
+        }
+
+    }
+
     private fun setupToggleButtons() {
         binding.toggleGroup.addOnButtonCheckedListener {
                 group, checkedId, isChecked ->
@@ -210,6 +248,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    //Click al marcador
+    override fun onMarkerClick(marker: Marker): Boolean {
+        //marker es el marcador al que le estas haciendo click
+        Toast.makeText(this, "${marker.position.latitude}, " +
+                "${marker.position.longitude}", Toast.LENGTH_LONG).show()
+        return false
+    }
+
+    override fun onMarkerDrag(marker: Marker) {
+        //mientras arrastras el marcador
+        // ocultas el menu de botones y haces transparente el marcador
+        binding.toggleGroup.visibility = View.INVISIBLE
+        marker.alpha = 0.4f
+    }
+
+    override fun onMarkerDragEnd(marker: Marker) {
+        //Cuando sueltas el marcador
+        binding.toggleGroup.visibility = View.VISIBLE
+        marker.alpha = 1.0f
+        //los marcadores tienen una ventana de información
+        //se le llama infoWindow
+        marker.showInfoWindow()
+    }
+
+    override fun onMarkerDragStart(marker: Marker) {
+        //cuando empiezas a arrastrar el marcador
+        marker.hideInfoWindow()//oculta la ventana de información
     }
 }
 
