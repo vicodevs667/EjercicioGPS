@@ -216,6 +216,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         //polyline.width = 40f
 
         /**
+         * creacion de una segunda linea Polyline
+         */
+        setupSecondPolyline()
+
+        /**
          * Evento de click sobre la linea trazada Polyline
          */
         polyline.tag = "Ruta de Univalle a Stadium"
@@ -240,6 +245,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             mMap.moveCamera(CameraUpdateFactory
                 .newLatLng(it))
         }
+    }
+
+    private fun setupSecondPolyline() {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(maternoInfantil, 12f))
+        val miRuta = mutableListOf(maternoInfantil, hospitalObrero)
+        val myPolyline = mMap.addPolyline(PolylineOptions()
+            .color(Color.YELLOW)
+            .width(20f)
+            .clickable(true)
+            .geodesic(true)
+            .jointType(JointType.ROUND)
+        )
+        myPolyline.points = miRuta
+        //Configurar la terminación o inicio de su línea
+        //myPolyline.startCap = RoundCap()//Default = Buttcap()
+        //myPolyline.endCap = SquareCap()
+        Utils.getBitmapFromVector(this, R.drawable.ic_directions_run_48)?.let {
+            myPolyline.startCap = CustomCap(BitmapDescriptorFactory.fromBitmap(it), 8f)
+        }
+        Utils.getBitmapFromVector(this, R.drawable.ic_downhill_skiing_48)?.let {
+            myPolyline.endCap = CustomCap(BitmapDescriptorFactory.fromBitmap(it), 8f)
+        }
+
     }
 
     private fun enableToggleButtons() {
