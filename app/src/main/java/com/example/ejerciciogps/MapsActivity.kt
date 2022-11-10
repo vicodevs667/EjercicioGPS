@@ -1,7 +1,9 @@
 package com.example.ejerciciogps
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.ejerciciogps.Coordenadas.avaroa
@@ -10,6 +12,7 @@ import com.example.ejerciciogps.Coordenadas.jardinJapones
 import com.example.ejerciciogps.Coordenadas.lapaz
 import com.example.ejerciciogps.Coordenadas.plazaIsabelCatolica
 import com.example.ejerciciogps.Coordenadas.univalle
+import com.example.ejerciciogps.Coordenadas.valleLuna
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -20,7 +23,8 @@ import com.google.android.gms.maps.model.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnMarkerDragListener {
 
     //Variable global que representa su mapa de Google
     private lateinit var mMap: GoogleMap
@@ -183,7 +187,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         univalleMarcador?.run {
             //setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))//cambiar color a marcador
             //setIcon(BitmapDescriptorFactory.defaultMarker(310f))//cambiar color a marcador
-            setIcon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant))
+            //setIcon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant))// icono personalizado
+            Utils.getBitmapFromVector(this@MapsActivity, R.drawable.ic_terrain_48)?.let {
+                setIcon(BitmapDescriptorFactory.fromBitmap(it))
+            }
             rotation = 75f
             setAnchor(0.5f, 0.5f)
             isFlat = true // define si el marcador rota o no con el mapa
@@ -192,6 +199,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         //Eventos a los marcadores
         //Evento click en el marker
         mMap.setOnMarkerClickListener(this)
+        //Evento drag del marcador
+        mMap.setOnMarkerDragListener(this)
+
+        /**
+         * Trazo de lineas entre puntos de coordenadas
+         * denominada Polyline
+         */
+        setupPolyline()
 
 
 
@@ -206,6 +221,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 .position(it)
             )
         }
+    }
+
+    private fun setupPolyline() {
+        //tener un arreglo o lista de puntos para trazar la linea
+        //Una ruta se compone de la unión de múltiples líneas
+        val routes = mutableListOf(univalle, plazaIsabelCatolica, jardinJapones, valleLuna)
+        val polyline = mMap.addPolyline(PolylineOptions()
+            .color(Color.YELLOW)
+            .width(15f)// ancho de la linea
+            .clickable(true)// que puedes hacerle click a la ruta o mejor dicho a la linea
+            .geodesic(true)// la curvatura de la tierra, la linea se curva con el radio de la tierra
+        )
+        //Para dibujar la linea se usa el atributo points
+        polyline.points = routes
     }
 
     /**
@@ -233,6 +262,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             "${marker.position.latitude}, ${marker.position.longitude}",
         Toast.LENGTH_LONG).show()
         return false
+    }
+
+    //Mientras es arrastrado el marcador
+    override fun onMarkerDrag(marker: Marker) {
+        //marker es el marcador que estas arrastrando
+        //binding.toggleGruop.visibility = View.INVISIBLE
+        binding.toggleGroup.visibility = View.INVISIBLE
+        marker.alpha = 0.4f
+    }
+
+    //cuando sueltas el marcador despues de haberlo arrastrado
+    override fun onMarkerDragEnd(marker: Marker) {
+        marker.alpha = 1.0f
+        binding.toggleGroup.visibility = View.VISIBLE
+        //Los marcadores tienen una ventana de información
+        // que se la conoce como  infoWindow
+        //o ventana de información del marcador
+        marker.showInfoWindow()
+    }
+
+    override fun onMarkerDragStart(marker: Marker) {
+        //oculta la ventana de información del marcador
+        marker.hideInfoWindow()
     }
 }
 
