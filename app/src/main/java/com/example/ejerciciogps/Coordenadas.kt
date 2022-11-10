@@ -10,4 +10,5 @@ object Coordenadas {
     val feria16Julio = LatLng(-16.500920000432075, -68.16341934016378)
     val hospitalObrero = LatLng(-16.499134572255755, -68.11708835869982)
     val lapaz = LatLng(-16.487949452741933, -68.11820589493456)
+    val cossmil = LatLng(-16.504943846230816, -68.11939404477526)
 }
