@@ -11,6 +11,7 @@ import com.example.ejerciciogps.Coordenadas.hospitalObrero
 import com.example.ejerciciogps.Coordenadas.jardinJapones
 import com.example.ejerciciogps.Coordenadas.lapaz
 import com.example.ejerciciogps.Coordenadas.plazaIsabelCatolica
+import com.example.ejerciciogps.Coordenadas.stadium
 import com.example.ejerciciogps.Coordenadas.univalle
 import com.example.ejerciciogps.Coordenadas.valleLuna
 
@@ -206,7 +207,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
          * Trazo de lineas entre puntos de coordenadas
          * denominada Polyline
          */
-        setupPolyline()
+        //setupPolyline()
+        //setupSecondPolyline()
+
+        /**
+         * Trazo de areas segmentos a traves de poligonos
+         * segmentar areas de accion del mapa
+         */
+        setupPolygon()
 
 
 
@@ -223,6 +231,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
+    private fun setupPolygon() {
+        val polygon = mMap.addPolygon(PolygonOptions()
+            .geodesic(true)
+            .clickable(true)
+            .fillColor(Color.WHITE)//Color de relleno en el area
+            .strokeColor(Color.RED)//Color de la linea que dibuja el area
+            .add(univalle, stadium, hospitalObrero)
+        )
+
+    }
+
     private fun setupPolyline() {
         //tener un arreglo o lista de puntos para trazar la linea
         //Una ruta se compone de la unión de múltiples líneas
@@ -234,7 +253,52 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             .geodesic(true)// la curvatura de la tierra, la linea se curva con el radio de la tierra
         )
         //Para dibujar la linea se usa el atributo points
-        polyline.points = routes
+        //polyline.points = routes
+        lifecycleScope.launch {
+            val myRealTimeRoutes = mutableListOf<LatLng>()
+            for (point in routes) {
+                myRealTimeRoutes.add(point)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
+                polyline.points = myRealTimeRoutes
+                delay(3_500)
+            }
+        }
+
+        //Personalizar la configuración del patrón de la linea
+        //1) linea sólida
+        //2) puntos interpunteado Dot()
+        //3) segmento de linea o guiones Dash(32f)
+        //Patron de la linea
+        //Gap representa separacion entre patron dibujado
+        polyline.pattern = listOf(Dot(), Gap(16f), Dash(32f), Gap(16f))
+        //Configuracion de la union entre lineas
+        polyline.jointType = JointType.BEVEL
+    }
+
+    private fun setupSecondPolyline() {
+        val myPersonalRoute = mutableListOf(stadium, hospitalObrero)
+        val secondPolyline = mMap.addPolyline(PolylineOptions()
+            .width(13f)
+            .color(Color.WHITE)
+            .clickable(true)
+            .geodesic(true)
+            .jointType(JointType.ROUND)
+        )
+        secondPolyline.points = myPersonalRoute
+        //Personalizar el punto inicial y final de la linea
+        //Primero mediante formas geometricas
+        //secondPolyline.startCap = SquareCap()// inicia con un cuadrado //Default ButtCap()
+        //secondPolyline.endCap = RoundCap()// termina de manera redondeada
+
+        //Segundo mediante uso de iconos personalizados al inicio
+        //y fin de la linea
+        Utils.getBitmapFromVector(this, R.drawable.ic_directions_run_32)?.let {
+            secondPolyline.startCap = CustomCap(BitmapDescriptorFactory.fromBitmap(it))
+        }
+        Utils.getBitmapFromVector(this, R.drawable.ic_directions_bike_32)?.let {
+            secondPolyline.endCap = CustomCap(BitmapDescriptorFactory.fromBitmap(it))
+        }
+
     }
 
     /**
